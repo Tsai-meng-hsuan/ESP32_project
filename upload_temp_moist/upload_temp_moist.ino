@@ -23,6 +23,8 @@ HTTPClient http;
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
   Serial.begin(115200); //ESP32胞率好像固定是115200
   dht.begin();  //初始化DHT
   WiFi.begin(ssid, password); //連線
@@ -41,8 +43,8 @@ void setup() {
 void loop() {
   float h = dht.readHumidity();     //取得濕度
   float t = dht.readTemperature();  //取得溫度C
-  h = 45.2;
-  t = 25.3;
+  // h = 45.2;
+  // t = 25.3;
   // 将湿度和温度转换为字符串
   String humidityStr = String(h, 2);   // 保留 2 位小数
   String temperatureStr = String(t, 2); // 保留 2 位小数
@@ -59,15 +61,22 @@ void loop() {
   int httpCode = http.GET();
   if (httpCode > 0) { //检查返回的代码
     String payload = http.getString();
+    Serial.print("httpCode: ");
     Serial.println(httpCode);
+    Serial.print("return: ");
     Serial.println(payload);
   }else {
+    Serial.print("httpCode: ");
     Serial.println(httpCode);
     Serial.println("Error on HTTP request");
   }
   http.end(); //释放资源
-  delay(15*60*1000);
-  // delay(5*1000);
+  Serial.println("==============================");
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(100);                      // wait for a second
+  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED off by making the voltage LOW
+  delay(100);
+  delay(15*60*1000-200); //1次循環時間
 }
 
 
